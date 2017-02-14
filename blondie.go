@@ -27,7 +27,7 @@ func main() {
 		_, err := net.Dial("tcp", *address)
 
 		if (err==nil) {
-			fmt.Println("Connection OKo")
+			fmt.Println("Connection OK")
 			os.Exit(0)
 		} else if (time.Now().Sub(start).Seconds()>*timeout) {
 			fmt.Println(err.Error())
