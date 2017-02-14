@@ -7,6 +7,9 @@ Args:
 * timeout:  timeout in seconds, defaults to 5
 * address: host and port, e.g. localhost:8080
 * poll-interval: poll interval in milliseconds, defaults to 250
+* exit-code-on-connect: defaults to 0
+* exit-code-on-fail: defaults to 1
+* quiet-mode: suppress all output, default true
 
 exit code is 1 if the connection is not established otherwise 0.
  
