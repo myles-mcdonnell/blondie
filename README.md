@@ -14,6 +14,7 @@ blondie -targets=localhost:8080:20,localhost:80:5 -poll-interval=500 -exit-code-
 Args:
 
 * targets: comma separated host, port and timeoutSeconds, e.g. localhost:8080:20,localhost:80:5
+* globalTimeout: global timeout in seconds
 * poll-interval: poll interval in milliseconds, defaults to 250
 * exit-code-on-connect: defaults to 0
 * exit-code-on-fail: defaults to 1

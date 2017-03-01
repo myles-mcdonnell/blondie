@@ -17,7 +17,8 @@ type outputWriter struct {
 
 func main() {
 
-	targets := flag.String("targets", "", "comma separated address:port:timeoutSeconds, e.g. localhost:8080:60")
+	targets := flag.String("targets", "", "comma separated address:port:timeoutSeconds, e.g. localhost:8080:60 timeout is optional in whichcase the global timeout is used")
+	globalTimeout := flag.Float64("globalTimeout", 5, "a global timeoput")
 	pollinterval := flag.Int("poll-interval", 250, "poll interval in milliseconds")
 	exitCodeOnConnectOk := flag.Int("exit-code-on-connect", 0, "Exit code when connection is made")
 	exitCodeOnConnectFail := flag.Int("exit-code-on-fail", 1, "Exit code when connection is not made")
@@ -38,15 +39,24 @@ func main() {
 			os.Exit(*exitCodeOnConnectFail)
 		}
 
-		var timeout, err = strconv.Atoi(addrPortAndTimeout[2])
-		if err!=nil {
-			panic(err)
+		var timeout float64
+		if len(addrPortAndTimeout)<3 {
+			timeout = *globalTimeout
+		} else {
+			var err error
+			to, err := strconv.Atoi(addrPortAndTimeout[2])
+			if err!=nil {
+				panic(err)
+			}
+
+			timeout = float64(to)
 		}
+
 		start := time.Now()
 
 		waitGroup.Add(1)
 
-		writer.Write(fmt.Sprintf("Trying to connect: %s", address))
+		writer.Write(fmt.Sprintf("Trying to connect: %s - timeout = %v seconds", address, timeout))
 		go func(){
 			for true {
 				_, err := net.Dial("tcp", address)
@@ -55,7 +65,7 @@ func main() {
 					writer.Write(fmt.Sprintf("Connection OK : %s", address))
 					waitGroup.Add(-1)
 					break//os.Exit(*exitCodeOnConnectOk)
-				} else if (time.Now().Sub(start).Seconds()>float64(timeout)) {
+				} else if (time.Now().Sub(start).Seconds()>timeout) {
 					writer.Write(fmt.Sprintf("%s : %s", err.Error(), address))
 					waitGroup.Add(-1)
 					failure = true
