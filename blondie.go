@@ -1,14 +1,14 @@
 package main
 
 import (
-	"os"
+	"flag"
 	"fmt"
 	"net"
-	"time"
-	"flag"
+	"os"
+	"strconv"
 	"strings"
 	"sync"
-	"strconv"
+	"time"
 )
 
 type outputWriter struct {
@@ -26,13 +26,13 @@ func main() {
 	flag.Parse()
 
 	var waitGroup = &sync.WaitGroup{}
-	var writer = &outputWriter{QuietMode:*quietMode}
+	var writer = &outputWriter{QuietMode: *quietMode}
 	var failure bool
 
 	for _, target := range strings.Split(*targets, ",") {
 		addrPortAndTimeout := strings.Split(target, ":")
 
-		var address = addrPortAndTimeout[0]+":"+addrPortAndTimeout[1]
+		var address = addrPortAndTimeout[0] + ":" + addrPortAndTimeout[1]
 
 		if address == "" {
 			fmt.Println("Please supply targets, e.g. -targets=localhost:8080;60,google.com:80;30")
@@ -40,12 +40,12 @@ func main() {
 		}
 
 		var timeout float64
-		if len(addrPortAndTimeout)<3 {
+		if len(addrPortAndTimeout) < 3 {
 			timeout = *globalTimeout
 		} else {
 			var err error
 			to, err := strconv.Atoi(addrPortAndTimeout[2])
-			if err!=nil {
+			if err != nil {
 				panic(err)
 			}
 
@@ -57,22 +57,22 @@ func main() {
 		waitGroup.Add(1)
 
 		writer.Write(fmt.Sprintf("Trying to connect: %s - timeout = %v seconds", address, timeout))
-		go func(){
+		go func() {
 			for true {
 				_, err := net.Dial("tcp", address)
 
-				if (err==nil) {
+				if err == nil {
 					writer.Write(fmt.Sprintf("Connection OK : %s", address))
 					waitGroup.Add(-1)
-					break//os.Exit(*exitCodeOnConnectOk)
-				} else if (time.Now().Sub(start).Seconds()>timeout) {
+					break
+				} else if time.Now().Sub(start).Seconds() > timeout {
 					writer.Write(fmt.Sprintf("%s : %s", err.Error(), address))
 					waitGroup.Add(-1)
 					failure = true
-					break//os.Exit(*exitCodeOnConnectFail)
+					break
 				}
 
-				time.Sleep(time.Millisecond*time.Duration(*pollinterval))
+				time.Sleep(time.Millisecond * time.Duration(*pollinterval))
 			}
 		}()
 	}
