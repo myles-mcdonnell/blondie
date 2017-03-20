@@ -25,6 +25,11 @@ func main() {
 	quietMode := flag.Bool("quiet-mode", false, "suppress all output")
 	flag.Parse()
 
+	if len(*targets) < 1 {
+		showUsage()
+		return
+	}
+
 	var waitGroup = &sync.WaitGroup{}
 	var writer = &outputWriter{QuietMode: *quietMode}
 	var failure bool
@@ -90,4 +95,14 @@ func (writer outputWriter) Write(message string) {
 	if !writer.QuietMode {
 		fmt.Println(message)
 	}
+}
+
+func showUsage() {
+	fmt.Println("Switches (prefix with -)")
+	fmt.Println("\t targets: comma separated host, port and timeoutSeconds, e.g. localhost:8080:20,localhost:80:5")
+	fmt.Println("\t globalTimeout: global timeout in seconds")
+	fmt.Println("\t poll-interval: poll interval in milliseconds, defaults to 250")
+	fmt.Println("\t exit-code-on-connect: defaults to 0")
+	fmt.Println("\t exit-code-on-fail: defaults to 1")
+	fmt.Println("\t quiet-mode: suppress all output, default true")
 }
