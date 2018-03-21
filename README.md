@@ -3,6 +3,23 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/myles-mcdonnell/blondie)](https://goreportcard.com/report/github.com/myles-mcdonnell/blondie)
 
 
+## install
+```sh
+go get -u github.com/banaio/blondie/...
+blondie -help
+Usage of blondie:
+  -exit-code-on-connect int
+    	Exit code when connection is made
+  -exit-code-on-fail int
+    	Exit code when connection is not made (default 1)
+  -poll-interval int
+    	poll interval in milliseconds (default 250)
+  -quiet-mode
+    	suppress all output
+  -targets string
+    	comma separated protocol:address:port:timeoutSeconds:[path]:[successcode], e.g. [tcp|http|https]:localhost:8080:60:[path]:[success_error_code] timeout is optional in which case the global timeout is used, final two arguments for htyp only
+```
+
 A command that polls one or more TCP sockets/HTTP endpoints until a connection is made or the timeout is hit.  Useful if you need to wait for a server or group of servers to start before doing something else.
 
 Why call it Blondie? This is the best I could come up with in the 5 seconds I allowed for naming it [https://www.youtube.com/watch?v=uWhkbDMISl8](https://www.youtube.com/watch?v=uWhkbDMISl8)
