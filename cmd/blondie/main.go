@@ -1,4 +1,4 @@
-package blondie
+package main
 
 import (
 	"flag"
