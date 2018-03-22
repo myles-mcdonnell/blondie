@@ -5,7 +5,7 @@
 
 ## install
 ```sh
-go get -u github.com/banaio/blondie/...
+go get -u github.com/myles-mcdonnell/blondie/...
 blondie -help
 Usage of blondie:
   -exit-code-on-connect int
