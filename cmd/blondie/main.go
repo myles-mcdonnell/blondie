@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	targets := flag.String("targets", "", "comma separated protocol:address:port:timeoutSeconds:[path]:[successcode], e.g. [tcp|http|https]:localhost:8080:60:[path]:[success_error_code] timeout is optional in which case the global timeout is used, final two arguments for htyp only")
 	pollinterval := flag.Int("poll-interval", 250, "poll interval in milliseconds")
 	exitCodeOnConnectOk := flag.Int("exit-code-on-connect", 0, "Exit code when connection is made")
@@ -49,7 +48,7 @@ func main() {
 		var err error
 		var port int
 		if port, err = strconv.Atoi(protoAddrPortAndTimeout[2]); err != nil {
-			fmt.Println("Unable to parse port %s", protoAddrPortAndTimeout[2])
+			fmt.Printf("Unable to parse port %s", protoAddrPortAndTimeout[2])
 			os.Exit(*exitCodeOnConnectFail)
 		}
 
@@ -74,7 +73,7 @@ func main() {
 			if len(protoAddrPortAndTimeout) > 5 {
 				successcode, err := strconv.Atoi(protoAddrPortAndTimeout[5])
 				if err != nil {
-					fmt.Println("Can not parse success code to int %s", protoAddrPortAndTimeout[5])
+					fmt.Printf("Can not parse success code to int %s", protoAddrPortAndTimeout[5])
 					os.Exit(*exitCodeOnConnectFail)
 				} else {
 					successcodes = []int{successcode}
@@ -85,7 +84,7 @@ func main() {
 			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successcodes)
 			break
 		default:
-			fmt.Println("Unsupported protocol %s", protocol)
+			fmt.Printf("Unsupported protocol %s", protocol)
 			os.Exit(*exitCodeOnConnectFail)
 		}
 
