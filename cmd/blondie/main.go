@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	targets := flag.String("targets", "", "comma separated protocol:address:port:timeoutSeconds:[path]:[successcode], e.g. [tcp|http|https]:localhost:8080:60:[path]:[success_error_code] timeout is optional in which case the global timeout is used, final two arguments for htyp only")
+	targets := flag.String("targets", "", "comma separated protocol:address:port:timeoutSeconds:[path]:[successcode0;successcode1], e.g. [tcp|http|https]:localhost:8080:60:healthcheck:200;204] timeout is optional in which case the global timeout is used, final two arguments for htyp only")
 	pollinterval := flag.Int("poll-interval", 250, "poll interval in milliseconds")
 	exitCodeOnConnectOk := flag.Int("exit-code-on-connect", 0, "Exit code when connection is made")
 	exitCodeOnConnectFail := flag.Int("exit-code-on-fail", 1, "Exit code when connection is not made")
@@ -65,23 +65,28 @@ func main() {
 			break
 		case "http":
 			var path string
-			var successcodes []int
+			var successCodes []int
 			if len(protoAddrPortAndTimeout) > 4 {
 				path = protoAddrPortAndTimeout[4]
 			}
 
 			if len(protoAddrPortAndTimeout) > 5 {
-				successcode, err := strconv.Atoi(protoAddrPortAndTimeout[5])
-				if err != nil {
-					fmt.Printf("Can not parse success code to int %s", protoAddrPortAndTimeout[5])
-					os.Exit(*exitCodeOnConnectFail)
-				} else {
-					successcodes = []int{successcode}
+				successCodeStr := strings.Split(protoAddrPortAndTimeout[5], "_")
+				successCodes = make([]int, len(successCodeStr))
+				for index := range successCodes {
+					successCode, err := strconv.Atoi(successCodeStr[index])
+					if err != nil {
+						fmt.Printf("Can not parse success code to int %s", protoAddrPortAndTimeout[5])
+						os.Exit(*exitCodeOnConnectFail)
+					} else {
+						successCodes[index] = successCode
+					}
 				}
+
 			} else {
-				successcodes = []int{}
+				successCodes = []int{}
 			}
-			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successcodes)
+			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successCodes)
 			break
 		default:
 			fmt.Printf("Unsupported protocol %s", protocol)

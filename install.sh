@@ -79,7 +79,7 @@ if [ "$OS" = "windows" ]; then
     BINARY="$BINARY.exe"
 fi
 
-BINARY_URL="$RELEASES_URL/download/3.0.1/$BINARY"
+BINARY_URL="$RELEASES_URL/download/$BLONDIE_INSTALL_VERSION/$BINARY"
 DOWNLOAD_FILE=$(mktemp)
 
 downloadFile "$BINARY_URL" "$DOWNLOAD_FILE"
