@@ -57,7 +57,7 @@ type httpCheck struct {
 }
 
 // NewHttpCheck creates a new DepCheck for a HTTP endpoint. Path may be an empty string and successCodes may be an empty slice in which case any response code will be considered a successful response
-func NewHttpCheck(host string, port int, timeout time.Duration, path string, successCodes []int, secure bool) DepCheck {
+func newHttpCheck(host string, port int, timeout time.Duration, path string, successCodes []int, secure bool) DepCheck {
 
 	client := http.Client{Timeout: timeout}
 	return &httpCheck{
@@ -71,6 +71,14 @@ func NewHttpCheck(host string, port int, timeout time.Duration, path string, suc
 		secure:       secure,
 		get:          client.Get,
 	}
+}
+
+func NewHttpCheck(host string, port int, timeout time.Duration, path string, successCodes []int) DepCheck {
+	return newHttpCheck(host, port, timeout, path, successCodes, false)
+}
+
+func NewHttpsCheck(host string, port int, timeout time.Duration, path string, successCodes []int) DepCheck {
+	return newHttpCheck(host, port, timeout, path, successCodes, true)
 }
 
 type DepCheck interface {

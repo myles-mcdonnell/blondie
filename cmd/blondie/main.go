@@ -87,7 +87,12 @@ func main() {
 			} else {
 				successCodes = []int{}
 			}
-			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successCodes, protocol == "https")
+			if protocol == "https" {
+				depChecks[index] = blondie.NewHttpsCheck(host, port, timeout, path, successCodes)
+			} else {
+				depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successCodes)
+			}
+
 			break
 		default:
 			fmt.Printf("Unsupported protocol %s", protocol)

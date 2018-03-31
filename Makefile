@@ -25,5 +25,8 @@ build_freebsd:
 build:
 	go build -o ./artefacts/blondie cmd/blondie/main.go
 
-system_tests:
+tests:
+	go test ./...
+
+system_test:
 	go test -tags cli_tests ./cli_tests
