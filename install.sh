@@ -1,23 +1,41 @@
 #!/bin/sh
 
 # This install script is intended to download and install the latest available
-# release of the dep dependency manager for Golang.
-#
-# It attempts to identify the current platform and an error will be thrown if
-# the platform is not supported.
-#
-# Environment variables:
-# - INSTALL_DIRECTORY (optional): defaults to $GOPATH/bin
-# - DEP_RELEASE_TAG (optional): defaults to fetching the latest release
-# - DEP_OS (optional): use a specific value for OS (mostly for testing)
-# - DEP_ARCH (optional): use a specific value for ARCH (mostly for testing)
+# release of blondie.
 #
 # You can install using this script:
-# $ curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+# $ curl https://raw.githubusercontent.com/myles-mcdonnell/blondie/master/install.sh | sh
+#
+# This script was shamelessly copied from https://raw.githubusercontent.com/golang/dep/master/install.sh
 
 set -e
 
 RELEASES_URL="https://github.com/myles-mcdonnell/blondie/releases"
+
+downloadJSON() {
+    url="$2"
+
+    echo "Fetching $url.."
+    if test -x "$(command -v curl)"; then
+        response=$(curl -s -L -w 'HTTPSTATUS:%{http_code}' -H 'Accept: application/json' "$url")
+        body=$(echo "$response" | sed -e 's/HTTPSTATUS\:.*//g')
+        code=$(echo "$response" | tr -d '\n' | sed -e 's/.*HTTPSTATUS://')
+    elif test -x "$(command -v wget)"; then
+        temp=$(mktemp)
+        body=$(wget -q --header='Accept: application/json' -O - --server-response "$url" 2> "$temp")
+        code=$(awk '/^  HTTP/{print $2}' < "$temp" | tail -1)
+        rm "$temp"
+    else
+        echo "Neither curl nor wget was available to perform http requests."
+        exit 1
+    fi
+    if [ "$code" != 200 ]; then
+        echo "Request failed with code $code"
+        exit 1
+    fi
+
+    eval "$1='$body'"
+}
 
 downloadFile() {
     url="$1"
@@ -78,6 +96,13 @@ BINARY="blondie_${OS}_${ARCH}"
 if [ "$OS" = "windows" ]; then
     BINARY="$BINARY.exe"
 fi
+
+# if BLONDIE_INSTALL_VERSION was not provided, assume latest
+if [ -z "$BLONDIE_INSTALL_VERSION" ]; then
+    downloadJSON LATEST_RELEASE "$RELEASES_URL/latest"
+    BLONDIE_INSTALL_VERSION=$(echo "${LATEST_RELEASE}" | tr -s '\n' ' ' | sed 's/.*"tag_name":"//' | sed 's/".*//' )
+fi
+echo "Release Tag = $BLONDIE_INSTALL_VERSION"
 
 BINARY_URL="$RELEASES_URL/download/$BLONDIE_INSTALL_VERSION/$BINARY"
 DOWNLOAD_FILE=$(mktemp)
