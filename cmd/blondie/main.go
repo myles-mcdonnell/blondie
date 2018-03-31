@@ -38,7 +38,7 @@ func main() {
 
 		var protocol = strings.ToLower(protoAddrPortAndTimeout[0])
 
-		if protocol != "tcp" && protocol != "http" {
+		if protocol != "tcp" && protocol != "http" && protocol != "https" {
 			fmt.Printf("Unrecognised protocol %s", protocol)
 			os.Exit(*exitCodeOnConnectFail)
 		}
@@ -62,15 +62,16 @@ func main() {
 		switch protocol {
 		case "tcp":
 			depChecks[index] = blondie.NewTcpCheck(host, port, timeout)
-			break
 		case "http":
+			fallthrough
+		case "https":
 			var path string
 			var successCodes []int
 			if len(protoAddrPortAndTimeout) > 4 {
 				path = protoAddrPortAndTimeout[4]
 			}
 
-			if len(protoAddrPortAndTimeout) > 5 {
+			if len(protoAddrPortAndTimeout) > 5 && len(protoAddrPortAndTimeout[5]) > 0 {
 				successCodeStr := strings.Split(protoAddrPortAndTimeout[5], "_")
 				successCodes = make([]int, len(successCodeStr))
 				for index := range successCodes {
@@ -86,7 +87,7 @@ func main() {
 			} else {
 				successCodes = []int{}
 			}
-			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successCodes)
+			depChecks[index] = blondie.NewHttpCheck(host, port, timeout, path, successCodes, protocol == "https")
 			break
 		default:
 			fmt.Printf("Unsupported protocol %s", protocol)

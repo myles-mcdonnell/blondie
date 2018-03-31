@@ -34,7 +34,7 @@ type netCheck struct {
 
 type tcpCheck struct {
 	netCheck
-	dial func(string, string) (net.Conn, error)
+	dial func(string, string, time.Duration) (net.Conn, error)
 }
 
 func NewTcpCheck(host string, port int, timeout time.Duration) DepCheck {
@@ -44,7 +44,7 @@ func NewTcpCheck(host string, port int, timeout time.Duration) DepCheck {
 			port:    port,
 			timeout: timeout,
 		},
-		dial: net.Dial,
+		dial: net.DialTimeout,
 	}
 }
 
@@ -52,11 +52,14 @@ type httpCheck struct {
 	netCheck
 	path         string
 	successCodes []int
+	secure       bool
 	get          func(string) (*http.Response, error)
 }
 
-// NewHttpCheck creates a new DepCheck for a HTTP endpoint. Path may be an empty string and successCodes may be an empty slice in which case any reponse code will be considered a successful response
-func NewHttpCheck(host string, port int, timeout time.Duration, path string, successCodes []int) DepCheck {
+// NewHttpCheck creates a new DepCheck for a HTTP endpoint. Path may be an empty string and successCodes may be an empty slice in which case any response code will be considered a successful response
+func NewHttpCheck(host string, port int, timeout time.Duration, path string, successCodes []int, secure bool) DepCheck {
+
+	client := http.Client{Timeout: timeout}
 	return &httpCheck{
 		netCheck: netCheck{
 			host:    host,
@@ -65,7 +68,8 @@ func NewHttpCheck(host string, port int, timeout time.Duration, path string, suc
 		},
 		successCodes: successCodes,
 		path:         path,
-		get:          http.Get,
+		secure:       secure,
+		get:          client.Get,
 	}
 }
 
@@ -80,7 +84,12 @@ func (check *netCheck) Timeout() time.Duration {
 }
 
 func (check *httpCheck) Try() bool {
-	endpoint := fmt.Sprintf("http://%s:%v/%s", check.host, check.port, check.path)
+	protocol := "http"
+	if check.secure {
+		protocol = "https"
+	}
+
+	endpoint := fmt.Sprintf("%s://%s:%v/%s", protocol, check.host, check.port, check.path)
 	resp, err := check.get(endpoint)
 
 	if err == nil {
@@ -100,12 +109,16 @@ func (check *httpCheck) Try() bool {
 
 func (check *tcpCheck) Try() bool {
 	address := fmt.Sprintf("%s:%v", check.host, check.port)
-	_, err := check.dial("tcp", address)
+	_, err := check.dial("tcp", address, check.timeout)
 	return err == nil
 }
 
 func (check *httpCheck) Address() string {
-	return fmt.Sprintf("http://%s:%v/%s", check.host, check.port, check.path)
+	protocol := "http"
+	if check.secure {
+		protocol = "https"
+	}
+	return fmt.Sprintf("%s://%s:%v/%s", protocol, check.host, check.port, check.path)
 }
 
 func (check *tcpCheck) Address() string {

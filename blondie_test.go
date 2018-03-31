@@ -11,7 +11,7 @@ import (
 
 var (
 	tcpCheckOk = &tcpCheck{
-		dial: func(string, string) (net.Conn, error) { return nil, nil },
+		dial: func(string, string, time.Duration) (net.Conn, error) { return nil, nil },
 		netCheck: netCheck{
 			host:    "localhost",
 			port:    80,
@@ -19,7 +19,7 @@ var (
 	}
 
 	tcpCheckFail = &tcpCheck{
-		dial: func(string, string) (net.Conn, error) { return nil, errors.New("test") },
+		dial: func(string, string, time.Duration) (net.Conn, error) { return nil, errors.New("test") },
 		netCheck: netCheck{
 			host:    "localhost",
 			port:    80,
