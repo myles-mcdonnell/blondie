@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	targets := flag.String("targets", "", "comma separated protocol:address:port:timeoutSeconds:[path]:[successcode0;successcode1], e.g. [tcp|http|https]:localhost:8080:60:healthcheck:200;204] timeout is optional in which case the global timeout is used, final two arguments for htyp only")
+	targets := flag.String("targets", "", "comma separated protocol:address:port:timeoutSeconds:[path]:[successcode0_successcode1], e.g. [tcp|http|https]:localhost:8080:60:healthcheck:200_204] timeout is optional in which case the global timeout is used, final two arguments for http only")
 	pollinterval := flag.Int("poll-interval", 250, "poll interval in milliseconds")
 	exitCodeOnConnectOk := flag.Int("exit-code-on-connect", 0, "Exit code when connection is made")
 	exitCodeOnConnectFail := flag.Int("exit-code-on-fail", 1, "Exit code when connection is not made")

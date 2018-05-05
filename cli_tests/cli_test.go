@@ -1,3 +1,5 @@
+// +build cli_tests
+
 package cli_tests
 
 import (

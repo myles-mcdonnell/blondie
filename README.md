@@ -1,4 +1,4 @@
-# Blondie
+## Blondie
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/myles-mcdonnell/blondie)](https://goreportcard.com/report/github.com/myles-mcdonnell/blondie)
 
@@ -7,8 +7,7 @@ Blondie is a CLI tool and package that tries to connect to HTTP and TCP endpoint
 The success criteria in the case of a TCP socket is a successful connection.  HTTP checks can be configured to accept any or one from a list of status codes as successful.
 
 
-## Install
-
+### Install
 The latest binaries for all supported operating systems are [here](https://github.com/myles-mcdonnell/blondie/releases)
 
 You may choose to execute the following script which will download the latest binary to `/usr/local/bin/blondie`:

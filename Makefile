@@ -3,12 +3,12 @@ SHELL=/bin/bash
 dep_release_tag := v0.4.1
 dep_version := $(shell dep version | grep -v -F "go version" | grep -F "version" | awk '{print $$3}')
 
-all: test build
+all: unit_test build system_test
 
-test:
+unit_test:
 	go test ./...
 
-build_all: build_linux build_darwin build_windows
+build_all: build_linux build_darwin build_windows build_freebsd
 
 build_linux:
 	GOOS=linux GOARCH=amd64 go build -o ./artefacts/blondie_linux_amd64 cmd/blondie/main.go
@@ -28,5 +28,5 @@ build:
 tests:
 	go test ./...
 
-system_test:
+system_test: build
 	go test -tags cli_tests ./cli_tests

@@ -146,15 +146,16 @@ func WaitForDeps(deps []DepCheck, opts *Options) bool {
 
 	waitGroup.Add(len(deps))
 	for _, target := range deps {
-		opts.Write(fmt.Sprintf("Trying to connect: %s - timeout = %v seconds", target.Address(), target.Timeout()))
+		opts.Write(fmt.Sprintf("Trying to connect: %s", target.Address()))
 		go func(target DepCheck) {
 			start := time.Now()
 			for true {
 				if target.Try() {
+					opts.Write(fmt.Sprintf("Connection OK : %s", target.Address()))
 					waitGroup.Done()
 					break
 				} else if time.Now().Sub(start) > target.Timeout() {
-					opts.Write(fmt.Sprintf("Timeout : %s", target.Address()))
+					opts.Write(fmt.Sprintf("Timed out : %s", target.Address()))
 					success = false
 					waitGroup.Done()
 					break
