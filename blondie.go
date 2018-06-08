@@ -117,7 +117,10 @@ func (check *httpCheck) Try() bool {
 
 func (check *tcpCheck) Try() bool {
 	address := fmt.Sprintf("%s:%v", check.host, check.port)
-	_, err := check.dial("tcp", address, check.timeout)
+	conn, err := check.dial("tcp", address, check.timeout)
+	if conn != nil {
+		conn.Close()
+	}
 	return err == nil
 }
 
