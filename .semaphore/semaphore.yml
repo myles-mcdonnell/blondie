@@ -7,6 +7,9 @@ agent:
 blocks:
   - name: Simple example
     task:
+      prologue:
+        commands:
+          - sem-version go 1.13
       env_vars:
         - name: APP_ENV
           value: prod
@@ -17,3 +20,6 @@ blocks:
             - echo $APP_ENV
             - checkout
             - ls -alh
+            - go test -v ./...
+            - go test -tags cli_tests ./cli_tests
+            
