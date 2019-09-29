@@ -9,7 +9,7 @@ blocks:
     task:
       prologue:
         commands:
-          - sem-version go 1.13
+          - sem-version go 1.12
       env_vars:
         - name: APP_ENV
           value: prod
